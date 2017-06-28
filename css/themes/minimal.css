@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css?family=Oswald:400,700|Raleway:300,500,600');
+
+body {
+	font-family:'Raleway';
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color:#191919;
+	clear: both;
+	font-family:'Oswald';
+	letter-spacing:.03em;
+	text-transform:uppercase;
+}
+
+h1 {
+	font-family:'Oswald';
+	text-transform:uppercase;
+	font-size: 2.5em;
+	font-weight:700;
+	letter-spacing:.03em;
+}
+
+p {
+	color:#555;
+	margin-bottom: 1.5em;
+	font-family:'Raleway';
+	letter-spacing:.04em;
+}
+
+#gismo-primary-menu li a{
+	font-family:'Oswald';
+	text-transform:uppercase;
+	letter-spacing:.08rem;
+	font-size:12px;
+	padding:0 20px;
+	display:block;
+	border-bottom:2px solid transparent;
+}
