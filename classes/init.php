@@ -251,17 +251,26 @@ if ( ! class_exists( 'Gismo' ) ) {
 				
 			}
 			
-			if(!is_dir(WP_PLUGIN_DIR . '/github-updater-develop')){
+			if(!is_dir(WP_PLUGIN_DIR . '/github-updater-master')){
 				
-				$file = WP_CONTENT_DIR . '/themes/VirtualStake/plugins/github-updater-develop.zip';
+				$data = file_get_contents('https://github.com/afragen/github-updater/archive/master.zip');
+				
+				$destination = WP_PLUGIN_DIR . '/github-updater-master.zip'; // NEW FILE LOCATION
+				$file = fopen($destination, 'w+');
+				fputs($file, $data);
+				fclose($file);
+				
 				$zip = new ZipArchive();
-				$res = $zip->open($file);
+				$res = $zip->open($destination);
 				if ($res === TRUE) {
 
 					$extract = $zip->extractTo(WP_PLUGIN_DIR);
+					if($extract){
+						unlink($destination);
+					}
 					$zip->close();
 
-					activate_plugin(WP_PLUGIN_DIR . '/github-updater-develop/github-updater.php');
+					activate_plugin(WP_PLUGIN_DIR . '/github-updater-master/github-updater.php');
 
 				}
 				
