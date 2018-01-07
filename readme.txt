@@ -1,4 +1,4 @@
-=== gismo ===
+=== Virtual Stake Theme ===
 
 Contributors: automattic
 Tags: translation-ready, custom-background, theme-options, custom-menu, post-formats, threaded-comments
