@@ -10,9 +10,14 @@ $gismo_ts = $GLOBALS['gismo_theme_settings'];
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+	
+	<div>
+		
+	<?php if($gismo_ts['layout']['page_title'] == 'default'):?>
 	<header class="entry-header">
 		<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
 	</header>
+	<?php endif;?>
 
 	<div class="entry-content<?php echo($gismo_ts['layout']['lazy_images'] == 1 ? ' lazy-load' : '');?>">
 		<?php
@@ -45,4 +50,7 @@ $gismo_ts = $GLOBALS['gismo_theme_settings'];
 			?>
 		</footer>
 	<?php endif; ?>
+		
+	</div>
+		
 </article>

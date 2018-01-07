@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
         });
 		
 		var $packet = $this.closest('form').serializeArray();
-		
+		console.log($packet);
 		$.ajax({
 			url: ajaxurl,
 			data: $packet,
@@ -111,7 +111,7 @@ jQuery(document).ready(function($) {
         });
 		
 		clone.find('h3').remove();
-		clone.find('.add-btn').parent().replaceWith('<div class="uk-push-3-4 uk-margin-top" align="right"><a class="uk-button remove-btn">Remove</a></div>');
+		clone.find('.add-btn').parent().replaceWith('<div class="uk-push-2-3 uk-margin-top" align="right"><a class="uk-button remove-btn">Remove</a></div>');
 		clone.attr('class','item uk-margin-bottom pad-1x rd5').attr('style','border:2px solid #eee');
 		
 		clone.find('select').each(function(index, element) {
@@ -122,7 +122,7 @@ jQuery(document).ready(function($) {
 		wrapper.siblings('form').find('.save-btn').before(clone);
 		wrapper.siblings('form').find('.save-btn').trigger('click');
 		
-		wrapper.siblings('form').sortable('update');
+		wrapper.find('input[type="text"], select').val('');
 		
 	});
 	
@@ -136,8 +136,6 @@ jQuery(document).ready(function($) {
 		if(form.find('.item').length === 0){
 			form.find('.save-btn').hide();
 		}
-		
-		form.sortable('update');
 		
 	});
 	

@@ -71,7 +71,11 @@ jQuery(document).ready(function($) {
 			
 		});
 		
-		load_more(data);
+		if($('.fetch-more').length === 1){
+		
+			load_more(data);
+		
+		}
 	
 	}
 	
@@ -95,7 +99,7 @@ jQuery(document).ready(function($) {
 					
 			if(results.success) {
 				
-				$('#main').find('.uk-grid').append(results.data);
+				$('#main').find('.uk-grid').first().append(results.data);
 				$('.fetch-more').replaceWith(results.fetcher);
 				
 				if($('body').height() < $(window).height() && $('.fetch-more').length === 1){

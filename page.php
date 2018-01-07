@@ -18,23 +18,23 @@ get_header(); ?>
 
 <div id="content" class="<?php echo apply_filters('gismo_content_classes', 'site-content');?>">
 
-	<div class="uk-grid">
+	<div class="flexy">
     
     	<?php if($gismo_ts['layout']['blog']['sidebar'] == 'left'):?>
 
-			<div class="uk-width-1-4">
-            	
-                <?php if(has_action('gismo_sidebar')):?>
-                <div class="uk-grid">
-            		<?php do_action('gismo_sidebar');?>
-                </div>
-                <?php endif;?>
+		<div>
 
-            </div>
+			<?php if(has_action('gismo_sidebar')):?>
+			<div>
+				<?php do_action('gismo_sidebar');?>
+			</div>
+			<?php endif;?>
+
+		</div>
 		
 		<?php endif;?>
 
-        <div class="<?php echo($gismo_ts['layout']['blog']['sidebar'] == 'none' ? 'uk-width-1-1' : 'uk-width-3-4');?>">
+        <div>
     
             <main id="main" class="site-main" role="main">
     
@@ -52,15 +52,15 @@ get_header(); ?>
         
         <?php if($gismo_ts['layout']['blog']['sidebar'] == 'right'):?>
 
-			<div class="uk-width-1-4">
-            	
-                <?php if(has_action('gismo_sidebar')):?>
-                <div class="uk-grid">
-            		<?php do_action('gismo_sidebar');?>
-                </div>
-                <?php endif;?>
+		<div>
 
-            </div>
+			<?php if(has_action('gismo_sidebar')):?>
+			<div>
+				<?php do_action('gismo_sidebar');?>
+			</div>
+			<?php endif;?>
+
+		</div>
 		
 		<?php endif;?>
         

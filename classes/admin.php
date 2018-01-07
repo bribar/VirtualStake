@@ -20,6 +20,9 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
 			add_action('wp_ajax_save_menus', array($this, 'gismo_save_settings'));			
 			add_action('wp_ajax_save_sidebars', array($this, 'gismo_save_settings'));
 			
+			add_action('add_meta_boxes', array($this,'gismo_post_format_section'), -100);
+			add_action('save_post', array($this,'gismo_post_format_section_save'), 10);
+			
 			$this->settings = get_option('gismo_theme_settings',false);
 			$this->settings['menus'] = get_option('gismo_theme_menus',false);
 			$this->settings['sidebars'] = get_option('gismo_theme_sidebars',false);
@@ -61,6 +64,18 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
 						$update = update_option('gismo_theme_sidebars',$post['sidebars']);
 						break;
 					default:
+						
+						if(!isset($post['settings']['layout']['uikit']['js_components'])){
+							$post['settings']['layout']['uikit']['js_components'] = [];
+						}
+						
+						if(!isset($post['settings']['layout']['uikit']['css_components'])){
+							$post['settings']['layout']['uikit']['css_components'] = [];
+						}
+						
+						if(!isset($post['settings']['layout']['lazy_images'])){
+							$post['settings']['layout']['lazy_images'] = 0;
+						}
 						$msg = 'Settings updated.';
 						$update = update_option('gismo_theme_settings',$post['settings']);
 						break;
@@ -118,7 +133,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                     
                         <nav class="uk-navbar">
                         	
-                            <div class="uk-navbar-brand"></div>
+                            <div class="uk-navbar-brand dashicons-before dashicons-welcome-widgets-menus"></div>
                             
                             <ul class="uk-navbar-nav main-navbar" data-uk-switcher="{connect:'#gismo-switcher'}">
                                 <li><a href="" class="uk-navbar-nav uk-active">Layout</a></li>
@@ -152,9 +167,11 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                                 <a class="delete-media uk-button" href="#">Remove</a>
                                             </div>
                                             
-                                            <div class="media-container uk-margin-top uk-margin-bottom" style="width:300px; height:100px;">
-                                                <?php echo(!empty($this->settings['style']['logo']['url']) ? '<img src="' . $this->settings['style']['logo']['url'] . '"/>' : '<img src="' . get_template_directory_uri() . '/images/gismo-logo.svg" width="120px" height="100px"/>');?>
+                                            
+                                            <div class="media-container uk-margin-top uk-margin-bottom" style="<?php echo(!empty($this->settings['style']['logo']['url']) && !empty($this->settings['style']['logo']['width']) ? 'width:' . $this->settings['style']['logo']['width'] . 'px;' : '');?><?php echo(!empty($this->settings['style']['logo']['url']) && !empty($this->settings['style']['logo']['height']) ? 'height:' . $this->settings['style']['logo']['height'] . 'px;' : '');?>">
+                                                <?php echo(!empty($this->settings['style']['logo']['url']) ? '<img src="' . $this->settings['style']['logo']['url'] . '"/>' : '<div style="background-color:#fff; display:block; width:100%; height:100%; border:2px solid #d9d9d9; text-align:center;" class="rd5"><a href="'.admin_url('options-general.php').'"><h3 style="margin-top:20px; margin-bottom:0;">'.get_bloginfo('name').'</h3><h5 style="margin-top:0; font-size:12px;">'.get_bloginfo('description').'</h5></a><p>{No Logo Set}</p></div>');?>
                                             </div>
+											
                                             
                                             <input class="media-url" name="settings[style][logo][url]" type="hidden" value="<?php echo(!empty($this->settings['style']['logo']['url']) ? $this->settings['style']['logo']['url'] : '');?>"/>
                                             
@@ -182,7 +199,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                             </div>
                                         
                                             <div class="media-container uk-margin-top site-background">
-                                                <?php echo(!empty($this->settings['style']['background']['url']) ? '<div class="rd5" style="display:block; width:100%; height:170px; background:url(' . $this->settings['style']['background']['url'] . ') no-repeat center center; background-size:cover;"></div>' : '<div class="rd5" style="display:block; width:100%; height:165px; line-height:165px; background-color:#fff; text-align:center; font-size:18px; border:2px solid #d9d9d9;">No Background Set</div>');?>
+                                                <?php echo(!empty($this->settings['style']['background']['url']) ? '<div class="rd5" style="display:block; width:100%; height:170px; background:url(' . $this->settings['style']['background']['url'] . ') no-repeat center center; background-size:cover;"></div>' : '<div class="rd5" style="display:block; width:100%; height:165px; line-height:165px; background-color:#fff; text-align:center; font-size:18px; border:2px solid #d9d9d9;">{No Background Set}</div>');?>
                                             </div>
                                             
                                             <input class="media-url" name="settings[style][background][url]" type="hidden" value="<?php echo(!empty($this->settings['style']['background']['url']) ? $this->settings['style']['background']['url'] : '');?>"/>
@@ -232,7 +249,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                 
                                 </div>
                                 
-                                <div class="uk-margin-bottom rd5 pad-1x" style="background-color:#f5f5f5;">
+                                <div class="uk-margin-bottom rd5 pad-1x" style="background-color:#f5f5f5; display: none;">
                                 	
                                 	<div class="uk-grid uk-grid-width-1-2">
                                     
@@ -256,7 +273,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                             </label>
                                             </div>
                                             
-                                            <h3>Site Header Position</h3>
+                                            <h3>Header Position</h3>
                                             <div>
                                             <label class="option2">
                                                 <input type="radio" name="settings[layout][header_position]" value="undocked"<?php echo($this->settings['layout']['header_position'] == 'undocked' ? ' checked' : '');?>/>
@@ -271,7 +288,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                             
                                             <div id="header-config" style="margin-top:25px;<?php echo($this->settings['layout']['orientation'] == 'horizontal' ? 'display:none;' : '');?>">
                                             
-                                            <h3>Site Header Configuration</h3>
+                                            <h3>Header Configuration</h3>
                                             <div>
                                             <label class="option2">
                                                 <input type="radio" name="settings[layout][header_config]" value="left"<?php echo($this->settings['layout']['header_config'] == 'left' ? ' checked' : '');?>/>
@@ -380,7 +397,20 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                         
                                         <div>
                                         	
-                                            <h3>Site Blog Article Layout</h3>
+                                            <h3>Page Title</h3>
+                                            <div>
+                                            <label class="option2">
+                                                <input type="radio" name="settings[layout][page_title]" value="default"<?php echo($this->settings['layout']['page_title'] == 'default' ? ' checked' : '');?>/>
+                                                <span class="radio">Default</span>
+                                            </label>
+                                            
+                                            <label class="option2">
+                                                <input type="radio" name="settings[layout][page_title]" value="custom"<?php echo($this->settings['layout']['page_title'] == 'custom' ? ' checked' : '');?>/>
+                                                <span class="radio">Custom</span>
+                                            </label>
+                                            </div>
+                                           
+                                            <h3>Blog Article Layout</h3>
                                             <div>
                                             <label class="option2">
                                                 <input type="radio" name="settings[layout][blog][layout]" value="stacked"<?php echo($this->settings['layout']['blog']['layout'] == 'stacked' ? ' checked' : '');?>/>
@@ -393,7 +423,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                             </label>
                                             </div>
                                             
-                                            <h3>Site Sidebar</h3>
+                                            <h3>Sidebar</h3>
                                             <div>
                                             <label class="option2">
                                                 <input type="radio" name="settings[layout][blog][sidebar]" value="left"<?php echo($this->settings['layout']['blog']['sidebar'] == 'left' ? ' checked' : '');?>/>
@@ -411,7 +441,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                             </label>
                                             </div>
                                             
-                                            <h3>Site Paging</h3>
+                                            <h3>Pagination</h3>
                                             <div>
                                             <label class="option2">
                                                 <input type="radio" name="settings[layout][blog][paging]" value="simple"<?php echo($this->settings['layout']['blog']['paging'] == 'simple' ? ' checked' : '');?>/>
@@ -861,7 +891,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                                 
                                             </div>
                                             
-                                            <div class="uk-push-3-4 uk-margin-top" align="right">
+                                            <div class="uk-push-2-3 uk-margin-top" align="right">
                                                 
                                                 <a class="uk-button remove-btn">Remove</a>
                                                 
@@ -905,16 +935,16 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                             <div class="select">
                                                 <select class="input" name="sidebars[<?php echo $size;?>][hook]">
                                                     <option value="">Select…</option>
-                                                    <option>Before Header</option>
-                                                    <option>After Header</option>
-                                                    <option>Before Logo</option>
-                                                    <option>After Logo</option>
-                                                    <option>Primary Navigation</option>
-                                                    <option>After Primary Navigation</option>
-                                                    <option>Secondary Navigation</option>
-                                                    <option>Sidebar</option>
-                                                    <option>Before Footer</option>
-                                                    <option>After Footer</option>
+                                                    <option value="gismo_before_header">Before Header</option>
+                                                    <option value="gismo_after_header">After Header</option>
+                                                    <option value="gismo_before_logo">Before Logo</option>
+                                                    <option value="gismo_after_logo">After Logo</option>
+                                                    <option value="gismo_primary_navigation">Primary Navigation</option>
+                                                    <option value="gismo_after_primary_navigation">After Primary Navigation</option>
+                                                    <option value="gismo_secondary_navigation">Secondary Navigation</option>
+                                                    <option value="gismo_sidebar">Sidebar</option>
+                                                    <option value="gismo_before_footer">Before Footer</option>
+                                                    <option value="gismo_after_footer">After Footer</option>
                                                 </select>
                                             </div>
                                             
@@ -1060,7 +1090,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
 		
 		public function add_menu() {
 			
-			add_menu_page('Gismo Theme Settings', 'Theme Settings', 'manage_options', 'gismo-settings', array($this, 'gismo_settings'), 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTUwIDE1MCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTUwIDE1MCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGc+PHBhdGggZmlsbD0iI0ZDQTg1NCIgZD0iTTE0MS4yLDk5LjhsLTksOS4ySDY5Yy0xOSwwLTMzLjYtMTUuNC0zMy42LTM0LjRzMTUuNC0zNC40LDM0LjQtMzQuNGM5LjUsMCwxOC4yLDMuOSwyNC40LDEwLjJsLTUuOSw2LjFjLTQuNy00LjgtMTEuMy03LjgtMTguNi03LjhjLTE0LjQsMC0yNiwxMS42LTI2LDI2YzAsMTQuNCwxMC45LDI1LDI1LjIsMjVMMTQxLjIsOTkuOHoiLz48cmVjdCB4PSI4OCIgeT0iODQiIGZpbGw9IiNGOTc0NTUiIHdpZHRoPSI2MCIgaGVpZ2h0PSI4Ii8+PHBhdGggZmlsbD0iIzUzQzQ3MyIgZD0iTTEyNS4yLDExN2wtOS4xLDkuMmMwLDAtMTguNCwwLTQ3LjEsMGMtMjguNCwwLTUwLjgtMjMuMi01MC44LTUxLjhjMC0yOC42LDIzLTUxLjcsNTEuNi01MS43YzE0LjUsMCwyNy41LDUuOSwzNi45LDE1LjVsLTYsNmMtNy45LTgtMTguOC0xMy0zMC45LTEzYy0yMy45LDAtNDMuMiwxOS40LTQzLjIsNDMuM0MyNi41LDk4LjUsNDUsMTE3LDY4LjksMTE3TDEyNS4yLDExN3oiLz48cGF0aCBmaWxsPSIjMjZBRUJDIiBkPSJNNjksMTQ0Yy0zOCwwLTY3LjYtMzEuMi02Ny42LTY5LjJjMC0zOCwzMC44LTY4LjksNjguOS02OC45YzE5LDAsMzYuMSw3LjcsNDguNiwyMC4xbC01LjcsNS44QzEwMi4xLDIwLjgsODcsMTQsNzAuMiwxNEMzNi43LDE0LDkuNSw0MSw5LjUsNzQuNWMwLDMyLjksMjYuMyw2MC41LDU5LjQsNjAuNWgzOC42bC04LjIsOUg2OXoiLz48L2c+PC9zdmc+', 61);
+			add_menu_page('Theme Settings', 'Theme Settings', 'manage_options', 'gismo-settings', array($this, 'gismo_settings'), 'dashicons-welcome-widgets-menus', 61);
 			
 		}
 		
@@ -1091,6 +1121,270 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
 			wp_enqueue_script('admin-style', get_template_directory_uri() . '/js/admin.js', array('jquery'), '2016.11.24', true);
 			
 			
+		}
+		
+		//*Adds a box to the main column on the Post and Page edit screens.
+
+		public function gismo_post_format_section() {
+		
+			$screens = array( 'post' );
+			
+			foreach ( $screens as $screen ) {
+
+				add_meta_box(
+
+					'post_format_section_id',
+
+					__( 'Post Format Section', 'post_format_section_textdomain' ),
+
+					array($this,'gismo_post_format_section_callback'),
+
+					$screen
+
+				);
+
+			}
+			
+		}
+		
+		public function gismo_post_format_section_callback( $post ) {
+		
+			wp_nonce_field( 'post_format_section_data', 'post_format_section_nonce' );
+			
+			$links = get_post_meta( $post->ID, '_gismo_post_format_section_links', true );
+		
+			ob_start();
+			
+			?>
+			
+			<?php if(!empty($links)):?>
+
+				<?php foreach($links as $link):?>
+				<div class="custom-image-select" style="display: flex;">
+					<div style="width: 85%; min-width: 200px;">
+						<input style="width:80%; margin-top:10px;" type="text" name="post_format_section_links[]" value="<?php echo $link;?>" placeholder="Paste Image URL or Select Image"/>
+						<a class="remove-custom-image" style="display: none; cursor: pointer;">Remove</a>
+					</div>
+					<div>
+						<button style="margin:9px 0 0 5px;" class="set_custom_image button">Select Image</button>
+					</div>
+				</div>
+				<?php endforeach;?>
+
+			<?php else:?>
+				
+				<div class="custom-image-select" style="display: flex;">
+					<div style="width: 85%; min-width: 200px;">
+						<input style="width:80%; margin-top:10px;" type="text" name="post_format_section_links[]" value="" placeholder="Paste Image URL or Select Image"/>
+						<a class="remove-custom-image" style="display: none; cursor: pointer;">Remove</a>
+					</div>
+					<div>
+						<button style="margin:9px 0 0 5px;" class="set_custom_image button">Select Image</button>
+					</div>
+				</div>
+
+			<?php endif;?>
+
+			<div class="add-custom-image" style="display: none; margin-top: 20px;">
+				<a style="cursor: pointer;">+ Add Image</a>	
+			</div>
+				
+			<script type="text/javascript">
+
+			jQuery(function($){
+				
+				$('#post_format_section_id').prependTo('#advanced-sortables');
+				
+				$('#advanced-sortables').prependTo('#postbox-container-2');
+				
+				if($('#side-sortables > #formatdiv').is(':visible')){
+					
+					switch($('input[name="post_format"]:checked').val()){
+						case 'image':
+						case 'video':
+							$('#wp-content-wrap').addClass('block-editor');
+							$('#postdivrich').find('textarea').prop('disabled',true);
+							break;
+						case 'gallery':
+							$('#wp-content-wrap').addClass('block-editor');
+							$('#postdivrich').find('textarea').prop('disabled',true);
+							$('.add-custom-image').show();
+							break;
+						default:
+							$('#post_format_section_id').hide();
+							break;
+					}
+					
+				}
+				
+				$('input[name="post_format"]').on('change',function(){
+					val = $(this).val();
+					switch(val){
+						case 'image':
+						case 'video':
+							$('.add-custom-image').hide();
+							$('#wp-content-wrap').addClass('block-editor');
+							$('#postdivrich').find('textarea').prop('disabled',true);
+							$('#post_format_section_id').show();
+							break;
+						case 'gallery':
+							$('.add-custom-image').show();
+							$('#wp-content-wrap').addClass('block-editor');
+							$('#postdivrich').find('textarea').prop('disabled',true);
+							$('#post_format_section_id').show();
+							break;
+						default:
+							$('.add-custom-image').hide();
+							$('#wp-content-wrap').removeClass('block-editor');
+							$('#postdivrich').find('textarea').removeAttr('disabled');
+							$('#post_format_section_id').hide();
+					}
+				});
+				
+				$('.add-custom-image > a').on('click',function(){
+					
+					var $this = $(this);
+					
+					var clone = $('.custom-image-select').last().clone();
+					
+					clone.find('input').val('');
+					
+					$this.parent().before(clone);
+					
+				});
+				
+				$('#post_format_section_id').on('click','.remove-custom-image',function(){
+					
+					var $this = $(this);
+					
+					if($('.custom-image-select').length > 1){
+						$this.closest('.custom-image-select').detach();
+					}
+					
+				});
+				
+				if ($('.set_custom_image').length > 0) {
+
+					if ( typeof wp !== "undefined" && wp.media && wp.media.editor) {
+
+						$('#post_format_section_id').on('click', '.set_custom_image', function(e) {
+
+							e.preventDefault();
+
+							var button = $(this);
+
+							var id = button.closest('.custom-image-select').find('input');
+
+							wp.media.editor.send.attachment = function(props, attachment) {
+
+								id.val(attachment.url);
+
+							};
+
+							wp.media.editor.open(button);
+
+							return false;
+
+						});
+
+					}
+
+				};
+				
+				$('#post_format_section_id .inside').sortable({
+					items : '.custom-image-select'
+				});
+
+			});
+
+			</script>
+
+			<style type="text/css">
+				.block-editor:before{
+					content:'Editor has been disabled, please use the Post Format Section.';
+					width: 100%;
+					height: 100%;
+					display: block;
+					position: absolute;
+					top: 0;
+					left: 0;
+					background: rgb(0, 0, 0) !important;
+					background: rgba(0, 0, 0, 0.8) !important;
+					filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+					-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+					z-index: 999999;
+					color: #fff;
+					text-align: center;
+					vertical-align: middle;
+					font-size: 18px;
+					padding-top: 25%;
+					box-sizing: border-box;
+				}
+				
+				.custom-image-select > div{
+					position: relative;
+				}
+				
+				.custom-image-select + .custom-image-select > div:hover .remove-custom-image{
+					display: block !important;
+					position: absolute;
+					top: 14px;
+					right: 5px;
+				}
+			</style>
+
+			<?php
+			
+			ob_end_flush();
+		
+		}
+		
+		public function gismo_post_format_section_save( $post_id ) {
+		//print_r($_POST);
+			if ( ! isset( $_POST['post_format_section_nonce'] ) ) {
+		
+				return;
+		
+			}
+		
+			if ( ! wp_verify_nonce( $_POST['post_format_section_nonce'], 'post_format_section_data' ) ) {
+		
+				return;
+		
+			}
+		
+			if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		
+				return;
+		
+			}
+		
+			if ( isset( $_POST['post_type'] ) && 'post' == $_POST['post_type'] ) {
+		
+				if ( ! current_user_can( 'edit_page', $post_id ) ) {
+		
+					return;
+		
+				}
+		
+			} else {
+		
+				if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		
+					return;
+		
+				}
+		
+			}
+		
+			if ( ! isset( $_POST['post_format_section_links'] ) ) {
+		
+				return;
+		
+			}
+			//print_r($_POST['post_format_section_links']);
+			update_post_meta( $post_id, '_gismo_post_format_section_links', $_POST['post_format_section_links'] );
+		
 		}
 		
 	}

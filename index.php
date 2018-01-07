@@ -21,14 +21,14 @@ get_header();
 ?>
 <div id="content" class="<?php echo apply_filters('gismo_content_classes', 'site-content');?>">
 
-	<div class="uk-grid">
+	<div class="flexy">
     
     	<?php if($gismo_ts['layout']['blog']['sidebar'] == 'left'):?>
         
-        <div class="uk-width-1-4">
+        <div>
         	
             <?php if(has_action('gismo_sidebar')):?>
-            <div class="uk-grid">
+            <div>
         		<?php do_action('gismo_sidebar');?>
             </div>
             <?php endif;?>
@@ -37,7 +37,7 @@ get_header();
         
         <?php endif;?>
 
-        <div class="<?php echo($gismo_ts['layout']['blog']['sidebar'] == 'none' ? 'uk-width-1-1' : 'uk-width-3-4');?>">
+        <div style="width: 100%;">
         	
             <main id="main" class="site-main" role="main">
     		
@@ -49,7 +49,7 @@ get_header();
             
             <?php if(have_posts()):?>
     			
-				<div class="uk-grid uk-container uk-container-center<?php echo($gismo_ts['layout']['blog']['layout'] == 'grid' ? ' uk-grid-width-small-1-1 uk-grid-width-medium-1-2 uk-grid-width-large-1-3' : ' uk-grid-width-1-1');?><?php echo($gismo_ts['layout']['blog']['paging'] == 'infinite' ? ' infinite-scroll' : '');?>"<?php echo($gismo_ts['layout']['blog']['layout'] == 'grid' ? ' data-uk-grid="{gutter: 20}"' : '');?>>
+				<div class="<?php echo($gismo_ts['layout']['blog']['layout'] == 'grid' ? ' uk-grid-width-small-1-1 uk-grid-width-medium-1-2 uk-grid-width-large-1-3' : ' uk-grid-width-1-1');?><?php echo($gismo_ts['layout']['blog']['paging'] == 'infinite' ? ' infinite-scroll' : '');?>"<?php echo($gismo_ts['layout']['blog']['layout'] == 'grid' ? ' data-uk-grid="{gutter: 20}"' : '');?>>
 				
                 <?php
                 /* Start the Loop */
@@ -67,9 +67,9 @@ get_header();
                 
                 </div>
                 
-                <div class="uk-grid uk-container uk-container-center uk-margin-large-bottom">
+                <div class="flexy">
                 
-                	<div class="uk-width-1-1">
+                	<div>
 					<?php
                         if($gismo_ts['layout']['blog']['paging'] == 'simple'){
                             
@@ -156,10 +156,10 @@ get_header();
         
         <?php if($gismo_ts['layout']['blog']['sidebar'] == 'right'):?>
         
-        <div class="uk-width-1-4">
+        <div>
         	
             <?php if(has_action('gismo_sidebar')):?>
-            <div class="uk-grid">
+            <div>
         		<?php do_action('gismo_sidebar');?>
             </div>
             <?php endif;?>
