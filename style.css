@@ -5,7 +5,7 @@ GitHub Theme URI: bribar/VirtualStake
 Author: Brian Barton
 Author URI: https://github.com/bribar
 Description: A wordpress theme for LDS stake websites.
-Version: 1.0.0
+Version: 0.0.9
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: gismo
@@ -572,7 +572,7 @@ textarea {
 	display: none;
 }
 
-#gismo-primary-menu ul:before, .site-info:before, .widget:before{
+#gismo-primary-menu ul:before, .site-info:before, #left .widget:before{
 	content: "";
     display: block;
     width: 48px;
@@ -751,7 +751,7 @@ header{
 
 .wp-is-mobile .blog .entry-title, .wp-is-mobile.single .entry-title{
 	font-size:2.5rem;
-	line-height:2rem;
+	line-height:2.5rem;
 }
 
 .cat-links a{
@@ -964,6 +964,24 @@ header{
 
 #gismo-primary-menu li a:hover, #gismo-primary-menu .current_page_item a{
 	color: #333;
+	position: relative;
+}
+
+#gismo-mobile-menu li a{
+	width: 100%;
+	display: inline-block;
+}
+
+#gismo-mobile-menu li a:hover, #gismo-mobile-menu .current_page_item a{
+	position: relative;
+}
+
+#gismo-primary-menu li a:hover:before, #gismo-primary-menu .current_page_item a:before, #gismo-mobile-menu li a:hover:before, #gismo-mobile-menu .current_page_item a:before{
+	position: absolute;
+	top: 0;
+	right: 0;
+	display: block;
+	content:'→';
 }
 
 .sub-menu{
@@ -1344,7 +1362,6 @@ article em{
 }
 
 article .entry-content a{
-	border-bottom: 1px dotted #bbb;
 	font-weight: 500;
 }
 

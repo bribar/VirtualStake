@@ -32,7 +32,13 @@ $links = get_post_meta( $post->ID, '_gismo_post_format_section_links', true );
 			<a href="" class="uk-slidenav uk-slidenav-contrast uk-slidenav-next" data-uk-slideshow-item="next"></a>
 		</div>
 		
-		<a href="<?php echo esc_url(get_permalink());?>" class="gallery-btn">VIEW</a>
+		<header class="entry-header">
+			<?php
+			
+				the_title( '<h2 class="entry-title" style="margin:10px 0 5px;"><a href="' . esc_url( get_permalink() ) . '" rel="bookmark">', '</a></h2>' );
+			
+			?>
+		</header>
 		
 	</div>
     

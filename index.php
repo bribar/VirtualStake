@@ -19,6 +19,17 @@ $gismo_ts = $GLOBALS['gismo_theme_settings'];
 get_header();
 
 ?>
+
+<?php if(is_home() && is_front_page()):?>
+
+<?php if(has_action('gismo_before_blog')):?>
+<div class="before-blog">
+<?php do_action('gismo_before_blog');?>
+</div>
+<?php endif;?>
+
+<?php endif;?>
+
 <div id="content" class="<?php echo apply_filters('gismo_content_classes', 'site-content');?>">
 
 	<div class="flexy">

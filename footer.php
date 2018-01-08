@@ -12,6 +12,7 @@
 $gismo_ts = $GLOBALS['gismo_theme_settings'];
 
 ?>
+
 	</div>
 
 </div>	

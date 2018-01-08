@@ -71,3 +71,9 @@ $links = get_post_meta( $post->ID, '_gismo_post_format_section_links', true );
 	</div>
     
 </article>
+
+<?php if(has_action('gismo_after_content')):?>
+<div class="after-content">
+<?php do_action('gismo_after_content');?>
+</div>
+<?php endif;?>

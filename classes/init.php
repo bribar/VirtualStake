@@ -8,6 +8,9 @@
 // gismo_primary_navigation
 // gismo_secondary_navigation
 // gismo_sidebar
+// gismo_before_blog
+// gismo_before_content
+// gismo_after_content
 // gismo_before_footer
 // gismo_after_footer
 
@@ -39,9 +42,7 @@ if ( ! class_exists( 'Gismo' ) ) {
 			
 			add_action('wp', array($this,'gismo_wp'));
 			add_action('widgets_init', array($this,'gismo_widgets_init'));
-			add_action('after_switch_theme', array($this,'gismo_switch_theme'));
-			add_action('after_setup_theme', array($this,'gismo_setup'));
-			add_action('after_setup_theme', array($this,'gismo_content_width'));
+			
 			add_action('wp_enqueue_scripts', array($this,'gismo_scripts'));
 			
 			add_action('wp_ajax_gismo_ajax_load_more', array($this,'gismo_ajax_load_more'));
@@ -106,7 +107,6 @@ if ( ! class_exists( 'Gismo' ) ) {
 			
 			global $wp_query;
 			$this->wp_query = $wp_query;
-			//print_r($wp_query);
 			
 		}
 		
@@ -155,412 +155,6 @@ if ( ! class_exists( 'Gismo' ) ) {
 		    wp_send_json($return);
 		    wp_die();
 		  
-		}
-		
-		/**
-		 * On theme install.
-		 */
-		public function gismo_switch_theme() {
-			
-			$settings = [
-				'style' => [
-					'logo'       => ['url' => '', 'width' => 300, 'height' => 100],
-					'background' => ['url' => '', 'size' => 'cover'],
-					'font'       => '', 
-					'theme'      => 'minimal' // minimal, custom
-				],
-				'layout' => [
-					'orientation'       => 'horizontal', // vertical, vertical-center, horizontal
-					'header_position'   => 'undocked',
-					'header_config'     => 'left',
-					'page_title'        => 'default',
-					'lazy_images'       => 0,
-					'uikit'             => [
-						'theme'          => 'default', // almost-flat, gradient
-						'css_components' => [],
-						'js_components'  => []
-					],
-					'blog'        => [
-						'layout'  => 'grid',
-						'sidebar' => 'none',
-						'paging'  => 'infinite'
-					]
-				],
-			];
-			
-		  	add_option('gismo_theme_settings', $settings);
-			
-			$menus = [];
-			
-			add_option('gismo_theme_menus', $menus);
-			
-			$sidebars = [];
-			
-			add_option('gismo_theme_sidebars', $sidebars);
-			
-			// BULK PLUGIN INSTALLS
-			$install_pluggins = [
-				'black-studio-tinymce-widget',
-				'visual-form-builder',
-				'disqus-comment-system',
-				'envira-gallery-lite',
-				'addthis',
-				'simple-social-icons',
-				'wordpress-seo',
-				'the-events-calendar',
-				'mailChimp-forms-by-mailmunch'
-			];
-			
-			$url = 'http://api.wordpress.org/plugins/info/1.0/';
-			$path = WP_PLUGIN_DIR . '/';
-			
-			foreach($install_pluggins as $plugin){
-				
-				if(!is_dir($path . $plugin)){
-					
-					$args = (object) array( 'slug' => $plugin );
-					
-					$request = array( 'action' => 'plugin_information', 'timeout' => 15, 'request' => serialize( $args) );
-					
-					$response = wp_remote_post( $url, array( 'body' => $request ) );
-					
-					$plugin_info = unserialize( $response['body'] );
-					
-					$file = $path . $plugin . '.zip';
-					file_put_contents($file, fopen($plugin_info->download_link, 'r'));
-					
-					if(filesize($file) > 0){
-						
-						$zip = new ZipArchive();
-						$res = $zip->open($file);
-						if ($res === TRUE) {
-							
-							$extract = $zip->extractTo(WP_PLUGIN_DIR);
-							if($extract){
-								unlink($file);
-							}
-							$zip->close();
-							
-							activate_plugin($path . $plugin . '/' . $plugin . '.php');
-							
-						}
-						
-					}
-					
-				}
-				
-			}
-			
-			if(!is_dir(WP_PLUGIN_DIR . '/github-updater-master')){
-				
-				$data = file_get_contents('https://github.com/afragen/github-updater/archive/master.zip');
-				
-				$destination = WP_PLUGIN_DIR . '/github-updater-master.zip'; // NEW FILE LOCATION
-				$file = fopen($destination, 'w+');
-				fputs($file, $data);
-				fclose($file);
-				
-				$zip = new ZipArchive();
-				$res = $zip->open($destination);
-				if ($res === TRUE) {
-
-					$extract = $zip->extractTo(WP_PLUGIN_DIR);
-					if($extract){
-						unlink($destination);
-					}
-					$zip->close();
-
-					activate_plugin(WP_PLUGIN_DIR . '/github-updater-master/github-updater.php');
-
-				}
-				
-			}
-			
-			update_option('gismo_theme_sidebars',array (
-				1 => array (
-					'name' => 'After Navigation',
-					'hook' => 'gismo_after_primary_navigation',
-					'class' => '',
-					'description' => '',
-					'title_class' => '',
-					'widget_class' => ''
-				),
-			));
-			
-			update_option('active_plugins',array (
-			  0 => 'addthis/addthis_social_widget.php',
-			  1 => 'black-studio-tinymce-widget/black-studio-tinymce-widget.php',
-			  2 => 'disqus-comment-system/disqus.php',
-			  3 => 'simple-social-icons/simple-social-icons.php'
-			));
-			
-			update_option('widget_search',array (
-				1 => array (
-					'title' => 'Search Site',
-				),
-				'_multiwidget' => 1
-			));
-			
-			if(get_option('widget_simple-social-icons') !== FALSE){
-				
-				update_option('widget_simple-social-icons',array (
-					2 => array (
-						'title' => 'Connect',
-						'size' => '36',
-						'border_radius' => '3',
-						'border_width' => '0',
-						'alignment' => 'alignleft',
-						'icon_color' => '#ffffff',
-						'icon_color_hover' => '#ffffff',
-						'background_color' => '#999999',
-						'background_color_hover' => '#666666',
-						'border_color' => '#ffffff',
-						'border_color_hover' => '#ffffff',
-						'behance' => '',
-						'bloglovin' => '',
-						'dribbble' => '',
-						'email' => '',
-						'facebook' => '#',
-						'flickr' => '',
-						'github' => '',
-						'gplus' => '',
-						'instagram' => '#',
-						'linkedin' => '',
-						'medium' => '',
-						'periscope' => '',
-						'phone' => '',
-						'pinterest' => '',
-						'rss' => '',
-						'snapchat' => '',
-						'stumbleupon' => '',
-						'tumblr' => '',
-						'twitter' => '',
-						'vimeo' => '',
-						'xing' => '',
-						'youtube' => '',
-					),
-					'_multiwidget' => 1
-				));
-				
-			}
-			
-			update_option('sidebars_widgets',array (
-				'wp_inactive_widgets' => array (
-					0 => 'archives-2',
-					1 => 'meta-2',
-					2 => 'categories-2',
-					3 => 'recent-posts-2',
-					4 => 'recent-comments-2'
-				),
-				'after-navigation-1' => array (
-					0 => 'search-1',
-					1 => 'simple-social-icons-2',
-				),
-				'array_version' => 3
-			));
-			
-			$pages = get_posts(array('numberposts' => 5, 'post_type' => 'page'));
-			
-			if(empty($pages)){
-				
-				wp_insert_post(array(
-					'post_title' => 'Beliefs',
-					'post_status' => 'publish',
-					'post_type' => 'page',
-					'post_content' => 'Add information about beliefs here.'
-				));
-				
-				wp_insert_post(array(
-					'post_title' => 'Family History',
-					'post_status' => 'publish',
-					'post_type' => 'page',
-					'post_content' => 'Add information about family history here.'
-				));
-				
-				wp_insert_post(array(
-					'post_title' => 'Children',
-					'post_status' => 'publish',
-					'post_type' => 'page',
-					'post_content' => 'Add information about what is offer for children.'
-				));
-				
-				wp_insert_post(array(
-					'post_title' => 'Sundays',
-					'post_status' => 'publish',
-					'post_type' => 'page',
-					'post_content' => 'Add information about the sunday schedule and what to expect.'
-				));
-				
-				wp_insert_post(array(
-					'post_title' => 'Contact Us',
-					'post_status' => 'publish',
-					'post_type' => 'page',
-					'post_content' => 'Add information about meeting times, location, and contact form.'
-				));
-				
-			}
-			
-			$posts = get_posts(array('numberposts' => 5, 'post_type' => 'post'));
-			
-			if(sizeof($posts) == 1){
-				
-				wp_delete_posts(1);
-				
-				$standard = wp_insert_post(array(
-					'post_title' => 'Standard Post',
-					'post_status' => 'publish',
-					'post_type' => 'post',
-					'post_content' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.'
-				));
-				
-				$quote = wp_insert_post(array(
-					'post_title' => 'Quote Post',
-					'post_status' => 'publish',
-					'post_type' => 'post',
-					'post_content' => 'Do not dwell in the past, do not dream of the future, concentrate the mind on the present moment.'
-				));
-				
-				$term = get_term_by('slug','post-format-quote','post_format');
-				wp_set_post_terms( $quote, $term->term_id, 'post_format' );
-				
-				
-				$video = wp_insert_post(array(
-					'post_title' => 'Video Post',
-					'post_status' => 'publish',
-					'post_type' => 'post',
-					'post_content' => ''
-				));
-				
-				$term = get_term_by('slug','post-format-video','post_format');
-				wp_set_post_terms( $video, $term->term_id, 'post_format' );
-				add_post_meta($video, '_gismo_post_format_section_links', array (
-				  	0 => 'https://vimeo.com/10602957'
-				));
-				
-				
-				$image = wp_insert_post(array(
-					'post_title' => 'Single Image Post',
-					'post_status' => 'publish',
-					'post_type' => 'post',
-					'post_content' => ''
-				));
-				
-				$term = get_term_by('slug','post-format-image','post_format');
-				wp_set_post_terms( $image, $term->term_id, 'post_format' );
-				add_post_meta($image, '_gismo_post_format_section_links', array (
-				  	0 => 'https://media.ldscdn.org/images/media-library/gospel-art/church-history/orson-hyde-dedicates-palestine-37726-gallery.jpg'
-				));
-				
-				
-				$gallery = wp_insert_post(array(
-					'post_title' => 'Image Gallery Post',
-					'post_status' => 'publish',
-					'post_type' => 'post',
-					'post_content' => ''
-				));
-				
-				$term = get_term_by('slug','post-format-gallery','post_format');
-				wp_set_post_terms( $gallery, $term->term_id, 'post_format' );
-				add_post_meta($gallery, '_gismo_post_format_section_links', array (
-					  0 => 'https://media.ldscdn.org/images/media-library/bible-images-the-life-of-jesus-christ/nearer-my-god-to-thee/jesus-miracle-healing-1617366-gallery.jpg',
-					  1 => 'https://media.ldscdn.org/images/media-library/bible-images-the-life-of-jesus-christ/acts-of-the-apostles/peter-baptizes-cornelius-gentiles-1426793-gallery.jpg',
-					  2 => 'https://media.ldscdn.org/images/media-library/bible-images-the-life-of-jesus-christ/acts-of-the-apostles/bible-videos-peter-1426810-gallery.jpg',
-					  3 => 'https://media.ldscdn.org/images/media-library/bible-images-the-life-of-jesus-christ/teachings/pictures-of-jesus-1138494-gallery.jpg',
-					  4 => 'https://media.ldscdn.org/images/media-library/bible-images-the-life-of-jesus-christ/teachings/jesus-christ-baptism-1402597-gallery.jpg'
-				));
-				
-			}
-			
-		}
-		
-		/**
-		 * Sets up theme defaults and registers support for various WordPress features.
-		 *
-		 * Note that this function is hooked into the after_setup_theme hook, which
-		 * runs before the init hook. The init hook is too late for some features, such
-		 * as indicating support for post thumbnails.
-		 */
-		public function gismo_setup() {
-			/*
-			 * Make theme available for translation.
-			 * Translations can be filed in the /languages/ directory.
-			 * If you're building a theme based on gismo, use a find and replace
-			 * to change 'gismo' to the name of your theme in all the template files.
-			 */
-			load_theme_textdomain( 'gismo', get_template_directory() . '/languages' );
-		
-			// Add default posts and comments RSS feed links to head.
-			add_theme_support( 'automatic-feed-links' );
-		
-			/*
-			 * Let WordPress manage the document title.
-			 * By adding theme support, we declare that this theme does not use a
-			 * hard-coded <title> tag in the document head, and expect WordPress to
-			 * provide it for us.
-			 */
-			add_theme_support( 'title-tag' );
-		
-			/*
-			 * Enable support for Post Thumbnails on posts and pages.
-			 *
-			 * @link https://developer.wordpress.org/themes/functionality/featured-images-post-thumbnails/
-			 */
-			add_theme_support( 'post-thumbnails' );
-		
-			// This theme uses custom wp_nav_menu() menus.
-			if(!empty($this->settings['menus'])){
-				
-				foreach($this->settings['menus'] as $key => $value){
-					
-					register_nav_menus( array(
-						strtolower(str_replace(' ','-',$value['location'])) => esc_html__( $value['location'], 'gismo' ),
-					) );	
-				
-				}
-				
-			}else{
-				
-				register_nav_menus( array(
-					'primary' => esc_html__( 'Primary Location', 'gismo' ),
-				) );	
-				
-			}
-			
-			register_nav_menus( array(
-				'_gismo_mobile_menu' => esc_html__( 'Mobile Location', 'gismo' ),
-			) );
-		
-			/*
-			 * Switch default core markup for search form, comment form, and comments
-			 * to output valid HTML5.
-			 */
-			add_theme_support( 'html5', array(
-				'search-form',
-				'comment-form',
-				'comment-list',
-				'gallery',
-				'caption',
-			) );
-		
-			// Set up the WordPress core custom background feature.
-			add_theme_support( 'custom-background', apply_filters( 'gismo_custom_background_args', array(
-				'default-color' => 'ffffff',
-				'default-image' => '',
-			) ) );
-			
-			add_theme_support( 'post-formats', array('image','quote','gallery','video'));
-			
-		}
-		
-		/**
-		 * Set the content width in pixels, based on the theme's design and stylesheet.
-		 *
-		 * Priority 0 to make it available to lower priority callbacks.
-		 *
-		 * @global int $content_width
-		 */
-		public function gismo_content_width() {
-			$GLOBALS['content_width'] = apply_filters( 'gismo_content_width', 640 );
 		}
 		
 		/**
@@ -987,6 +581,27 @@ if ( ! class_exists( 'Gismo' ) ) {
 				echo '</script>';
 			}
 			
+			if(!empty($this->settings['style']['color'])){
+				ob_start();
+				?>
+				<style type="text/css">
+					#gismo-primary-menu li a:hover, .entry-title a:hover, .entry-content a:hover{
+						color:<?php echo $this->settings['style']['color'];?> !important;
+					}
+					.entry-content a:hover{
+						border-bottom: 1px dotted <?php echo $this->settings['style']['color'];?>;
+					}
+					.single .nav-links > div:hover, .simple-social-icons ul li a:hover, .simple-social-icons ul li a:focus{
+						background-color: <?php echo $this->settings['style']['color'];?> !important;
+					}
+					.single .nav-links > div:hover a p{
+						color: #fff !important;
+					}
+				</style>
+				<?php
+				ob_end_flush();
+			}
+			
 		}
 		
 		public function gismo_add_page_elements_footer() {
@@ -1001,6 +616,69 @@ if ( ! class_exists( 'Gismo' ) ) {
 				echo '</script>';
 			}
 			
+			if(!empty($this->settings['style']['color'])){
+				$color = $this->readableColour($this->settings['style']['color']);
+				ob_start();
+				?>
+				<style type="text/css">
+					#gismo-primary-menu li a:hover, #gismo-mobile-menu li a:hover, .entry-title a:hover, .entry-content a{
+						color:<?php echo $this->settings['style']['color'];?> !important;
+					}
+					.entry-content a:hover{
+						border-bottom: 1px dotted <?php echo $this->settings['style']['color'];?>;
+					}
+					.single .nav-links > div:hover, .simple-social-icons ul li a:hover, .simple-social-icons ul li a:focus{
+						background-color: <?php echo $this->settings['style']['color'];?> !important;
+					}
+					.simple-social-icons ul li a:hover svg[class^="social-"], .simple-social-icons ul li a:hover svg[class*=" social-"], .simple-social-icons ul li a:focus svg[class^="social-"], .simple-social-icons ul li a:focus svg[class*=" social-"] {
+						display: inline-block;
+						width: 1em;
+						height: 1em;
+						stroke-width: 0;
+						stroke: <?php echo $color;?>;
+						fill: <?php echo $color;?>;
+					}
+					.single .nav-links > div:hover a p{
+						color: <?php echo $color;?> !important;
+					}
+					.visual-form-builder input[type="submit"], #comments input[type="submit"]{
+						background-color: <?php echo $this->settings['style']['color'];?> !important;
+						border: none;
+						color: <?php echo $color;?>;
+						-moz-border-radius: 4px;
+						-webkit-border-radius: 4px;
+						border-radius: 4px;
+						-khtml-border-radius: 4px;
+						padding: 5px 15px;
+					}
+					blockquote {
+						border-left: 5px solid <?php echo $this->settings['style']['color'];?> !important;
+					}
+				</style>
+				<?php
+				ob_end_flush();
+			}
+			
+		}
+		
+		private function readableColour($bg){
+			$bg = str_replace('#', '', $bg);
+
+			$r = hexdec(substr($bg,0,2));
+			$g = hexdec(substr($bg,2,2));
+			$b = hexdec(substr($bg,4,2));
+
+			$contrast = sqrt(
+				$r * $r * .241 +
+				$g * $g * .691 +
+				$b * $b * .068
+			);
+
+			if($contrast > 130){
+				return '#000000';
+			}else{
+				return '#FFFFFF';
+			}
 		}
 		
 		public function gismo_body_classes($classes) {

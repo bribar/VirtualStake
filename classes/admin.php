@@ -16,6 +16,10 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
 			add_action('admin_menu', array($this, 'add_menu'));
 			add_action('admin_init', array($this, 'admin_init'), 20);
 			
+			add_action('after_switch_theme', array($this,'gismo_switch_theme'));
+			add_action('after_setup_theme', array($this,'gismo_setup'));
+			add_action('after_setup_theme', array($this,'gismo_content_width'));
+			
 			add_action('wp_ajax_save_settings', array($this, 'gismo_save_settings'));
 			add_action('wp_ajax_save_menus', array($this, 'gismo_save_settings'));			
 			add_action('wp_ajax_save_sidebars', array($this, 'gismo_save_settings'));
@@ -34,6 +38,420 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
 			add_action('admin_enqueue_scripts', array($this, 'admin_styles'));
 			add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
 			
+		}
+		
+		/**
+		 * On theme install.
+		 */
+		public function gismo_switch_theme() {
+			
+			$settings = [
+				'style' => [
+					'logo'       => ['url' => '', 'width' => 300, 'height' => 100],
+					'background' => ['url' => '', 'size' => 'cover'],
+					'font'       => '', 
+					'theme'      => 'minimal', // minimal, custom
+					'color'      => '#1e73be'
+				],
+				'layout' => [
+					'orientation'       => 'horizontal', // vertical, vertical-center, horizontal
+					'header_position'   => 'undocked',
+					'header_config'     => 'left',
+					'page_title'        => 'default',
+					'lazy_images'       => 0,
+					'uikit'             => [
+						'theme'          => 'default', // almost-flat, gradient
+						'css_components' => ['slidenav','slideshow'],
+						'js_components'  => ['lightbox','slideshow']
+					],
+					'blog'        => [
+						'layout'  => 'grid',
+						'sidebar' => 'none',
+						'paging'  => 'infinite'
+					]
+				],
+			];
+			
+		  	add_option('gismo_theme_settings', $settings);
+			
+			$menus = [];
+			
+			add_option('gismo_theme_menus', $menus);
+			
+			$sidebars = [];
+			
+			add_option('gismo_theme_sidebars', $sidebars);
+			
+			// BULK PLUGIN INSTALLS
+			$install_pluggins = [
+				['black-studio-tinymce-widget','black-studio-tinymce-widget',1],
+				['visual-form-builder','',0],
+				['disqus-comment-system','disqus',1],
+				['envira-gallery-lite','',0],
+				['addthis','addthis_social_widget',1],
+				['simple-social-icons','simple-social-icons',1],
+				['wordpress-seo','',0],
+				['the-events-calendar','',0],
+				['mailChimp-forms-by-mailmunch','',0]
+			];
+			
+			$url = 'http://api.wordpress.org/plugins/info/1.0/';
+			$path = WP_PLUGIN_DIR . '/';
+			
+			$active_plugins = [];
+			foreach($install_pluggins as $plugin){
+				
+				if(!is_dir($path . $plugin[0])){
+					
+					$args = (object) array( 'slug' => $plugin[0] );
+					
+					$request = array( 'action' => 'plugin_information', 'timeout' => 15, 'request' => serialize( $args) );
+					
+					$response = wp_remote_post( $url, array( 'body' => $request ) );
+					
+					$plugin_info = unserialize( $response['body'] );
+					
+					$file = $path . $plugin[0] . '.zip';
+					file_put_contents($file, fopen($plugin_info->download_link, 'r'));
+					
+					if(filesize($file) > 0){
+						
+						$zip = new ZipArchive();
+						$res = $zip->open($file);
+						if ($res === TRUE) {
+							
+							$extract = $zip->extractTo(WP_PLUGIN_DIR);
+							if($extract){
+								if($plugin[2]){
+									$active_plugins[] = $plugin[0] . '/' . $plugin[1] . '.php';
+								}
+								unlink($file);
+								
+								//activate_plugin($path . $plugin[0] . '/' . $plugin[1] . '.php');
+							}
+							
+							$zip->close();
+							
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+			if(!is_dir(WP_PLUGIN_DIR . '/github-updater-master')){
+				// INSTALL GITHUB UPDATER TO KEEP THEME UP-TO-DATE
+				
+				$data = file_get_contents('https://github.com/afragen/github-updater/archive/master.zip');
+				
+				$destination = WP_PLUGIN_DIR . '/github-updater-master.zip'; // NEW FILE LOCATION
+				$file = fopen($destination, 'w+');
+				fputs($file, $data);
+				fclose($file);
+				
+				$zip = new ZipArchive();
+				$res = $zip->open($destination);
+				if ($res === TRUE) {
+
+					$extract = $zip->extractTo(WP_PLUGIN_DIR);
+					if($extract){
+						unlink($destination);
+						$active_plugins[] = 'github-updater-master/github-updater.php';
+						//activate_plugin(WP_PLUGIN_DIR . '/github-updater-master/github-updater.php');
+					}
+					
+					$zip->close();
+
+				}
+				
+			}
+			
+			update_option('gismo_theme_sidebars',array (
+				1 => array (
+					'name' => 'After Navigation',
+					'hook' => 'gismo_after_primary_navigation',
+					'class' => '',
+					'description' => '',
+					'title_class' => '',
+					'widget_class' => ''
+				),
+			));
+			
+			update_option('active_plugins',$active_plugins);
+			
+			update_option('widget_search',array (
+				1 => array (
+					'title' => 'Search Site',
+				),
+				'_multiwidget' => 1
+			));
+			
+			update_option('widget_simple-social-icons',array (
+				2 => array (
+					'title' => 'Connect',
+					'size' => '36',
+					'border_radius' => '3',
+					'border_width' => '0',
+					'alignment' => 'alignleft',
+					'icon_color' => '#ffffff',
+					'icon_color_hover' => '#ffffff',
+					'background_color' => '#999999',
+					'background_color_hover' => '#666666',
+					'border_color' => '#ffffff',
+					'border_color_hover' => '#ffffff',
+					'behance' => '',
+					'bloglovin' => '',
+					'dribbble' => '',
+					'email' => '',
+					'facebook' => '#',
+					'flickr' => '',
+					'github' => '',
+					'gplus' => '',
+					'instagram' => '#',
+					'linkedin' => '',
+					'medium' => '',
+					'periscope' => '',
+					'phone' => '',
+					'pinterest' => '',
+					'rss' => '',
+					'snapchat' => '',
+					'stumbleupon' => '',
+					'tumblr' => '',
+					'twitter' => '',
+					'vimeo' => '',
+					'xing' => '',
+					'youtube' => '',
+				),
+				'_multiwidget' => 1
+			));
+			
+			update_option('sidebars_widgets',array (
+				'wp_inactive_widgets' => array (
+					0 => 'archives-2',
+					1 => 'meta-2',
+					2 => 'categories-2',
+					3 => 'recent-posts-2',
+					4 => 'recent-comments-2'
+				),
+				'after-navigation-1' => array (
+					0 => 'search-1',
+					1 => 'simple-social-icons-2',
+				),
+				'array_version' => 3
+			));
+			
+			$pages = get_posts(array('numberposts' => 1, 'post_type' => 'page', 'name' => 'sample-page'));
+			
+			if(!empty($pages)){
+				
+				wp_delete_post(2,TRUE);
+				
+				wp_insert_post(array(
+					'post_title' => 'Beliefs',
+					'post_status' => 'publish',
+					'post_type' => 'page',
+					'post_content' => 'Add information about beliefs here.'
+				));
+				
+				wp_insert_post(array(
+					'post_title' => 'Family History',
+					'post_status' => 'publish',
+					'post_type' => 'page',
+					'post_content' => 'Add information about family history here.'
+				));
+				
+				wp_insert_post(array(
+					'post_title' => 'Children',
+					'post_status' => 'publish',
+					'post_type' => 'page',
+					'post_content' => 'Add information about what is offer for children.'
+				));
+				
+				wp_insert_post(array(
+					'post_title' => 'Sundays',
+					'post_status' => 'publish',
+					'post_type' => 'page',
+					'post_content' => 'Add information about the sunday schedule and what to expect.'
+				));
+				
+				wp_insert_post(array(
+					'post_title' => 'Contact Us',
+					'post_status' => 'publish',
+					'post_type' => 'page',
+					'post_content' => 'Add information about meeting times, location, and contact form.'
+				));
+				
+			}
+			
+			$posts = get_posts(array('numberposts' => 1, 'post_type' => 'post', 'post_status' => 'publish', 'name' => 'hello-world'));
+			
+			if(!empty($posts)){
+				
+				wp_delete_post(1,TRUE);
+				
+				$standard = wp_insert_post(array(
+					'post_title' => 'Standard Post',
+					'post_status' => 'publish',
+					'post_type' => 'post',
+					'post_content' => 'Lorem Ipsum is <a href="http://www.google.com">simply dummy text</a> of the printing and typesetting industry. Lorem Ipsum has been the industry\'s <strong>standard dummy text</strong> ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. <em>It has survived not only five centuries</em>, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+					<ul>
+						<li>List Item #1</li>
+						<li>List Item #2</li>
+						<li>List Item #3</li>
+					</ul>
+					<ol>
+						<li>Numbered Item #1</li>
+						<li>Numbered Item #2</li>
+						<li>Numbered Item #3</li>
+					</ol>
+					<blockquote>This is quoted text</blockquote>'
+				));
+				
+				$quote_id = wp_insert_post(array(
+					'post_title' => 'Quote Post',
+					'post_status' => 'publish',
+					'post_type' => 'post',
+					'post_content' => 'Do not dwell in the past, do not dream of the future, concentrate the mind on the present moment.'
+				));
+				
+				wp_set_post_terms( $quote_id, 'post-format-quote', 'post_format' );
+				
+				
+				$video_id = wp_insert_post(array(
+					'post_title' => 'Video Post',
+					'post_status' => 'publish',
+					'post_type' => 'post',
+					'post_content' => ''
+				));
+				
+				wp_set_post_terms( $video_id, 'post-format-video', 'post_format' );
+				add_post_meta($video_id, '_gismo_post_format_section_links', array (
+				  	0 => 'https://vimeo.com/10602957'
+				));
+				
+				
+				$image_id = wp_insert_post(array(
+					'post_title' => 'Single Image Post',
+					'post_status' => 'publish',
+					'post_type' => 'post',
+					'post_content' => ''
+				));
+				
+				wp_set_post_terms( $image_id, 'post-format-image', 'post_format' );
+				add_post_meta($image_id, '_gismo_post_format_section_links', array (
+				  	0 => 'https://media.ldscdn.org/images/media-library/gospel-art/church-history/orson-hyde-dedicates-palestine-37726-gallery.jpg'
+				));
+				
+				
+				$gallery_id = wp_insert_post(array(
+					'post_title' => 'Image Gallery Post',
+					'post_status' => 'publish',
+					'post_type' => 'post',
+					'post_content' => ''
+				));
+				
+				wp_set_post_terms( $gallery_id, 'post-format-gallery', 'post_format' );
+				add_post_meta($gallery_id, '_gismo_post_format_section_links', array (
+					  0 => 'https://media.ldscdn.org/images/media-library/bible-images-the-life-of-jesus-christ/nearer-my-god-to-thee/jesus-miracle-healing-1617366-gallery.jpg',
+					  1 => 'https://media.ldscdn.org/images/media-library/bible-images-the-life-of-jesus-christ/acts-of-the-apostles/peter-baptizes-cornelius-gentiles-1426793-gallery.jpg',
+					  2 => 'https://media.ldscdn.org/images/media-library/bible-images-the-life-of-jesus-christ/acts-of-the-apostles/bible-videos-peter-1426810-gallery.jpg',
+					  3 => 'https://media.ldscdn.org/images/media-library/bible-images-the-life-of-jesus-christ/teachings/pictures-of-jesus-1138494-gallery.jpg',
+					  4 => 'https://media.ldscdn.org/images/media-library/bible-images-the-life-of-jesus-christ/teachings/jesus-christ-baptism-1402597-gallery.jpg'
+				));
+				
+			}
+			
+		}
+		
+		/**
+		 * Sets up theme defaults and registers support for various WordPress features.
+		 *
+		 * Note that this function is hooked into the after_setup_theme hook, which
+		 * runs before the init hook. The init hook is too late for some features, such
+		 * as indicating support for post thumbnails.
+		 */
+		public function gismo_setup() {
+			/*
+			 * Make theme available for translation.
+			 * Translations can be filed in the /languages/ directory.
+			 * If you're building a theme based on gismo, use a find and replace
+			 * to change 'gismo' to the name of your theme in all the template files.
+			 */
+			load_theme_textdomain( 'gismo', get_template_directory() . '/languages' );
+		
+			// Add default posts and comments RSS feed links to head.
+			add_theme_support( 'automatic-feed-links' );
+		
+			/*
+			 * Let WordPress manage the document title.
+			 * By adding theme support, we declare that this theme does not use a
+			 * hard-coded <title> tag in the document head, and expect WordPress to
+			 * provide it for us.
+			 */
+			add_theme_support( 'title-tag' );
+		
+			/*
+			 * Enable support for Post Thumbnails on posts and pages.
+			 *
+			 * @link https://developer.wordpress.org/themes/functionality/featured-images-post-thumbnails/
+			 */
+			add_theme_support( 'post-thumbnails' );
+		
+			// This theme uses custom wp_nav_menu() menus.
+			if(!empty($this->settings['menus'])){
+				
+				foreach($this->settings['menus'] as $key => $value){
+					
+					register_nav_menus( array(
+						strtolower(str_replace(' ','-',$value['location'])) => esc_html__( $value['location'], 'gismo' ),
+					) );	
+				
+				}
+				
+			}else{
+				
+				register_nav_menus( array(
+					'primary' => esc_html__( 'Primary Location', 'gismo' ),
+				) );	
+				
+			}
+			
+			register_nav_menus( array(
+				'_gismo_mobile_menu' => esc_html__( 'Mobile Location', 'gismo' ),
+			) );
+		
+			/*
+			 * Switch default core markup for search form, comment form, and comments
+			 * to output valid HTML5.
+			 */
+			add_theme_support( 'html5', array(
+				'search-form',
+				'comment-form',
+				'comment-list',
+				'gallery',
+				'caption',
+			) );
+		
+			// Set up the WordPress core custom background feature.
+			add_theme_support( 'custom-background', apply_filters( 'gismo_custom_background_args', array(
+				'default-color' => 'ffffff',
+				'default-image' => '',
+			) ) );
+			
+			add_theme_support( 'post-formats', array('image','quote','gallery','video'));
+			
+		}
+		
+		/**
+		 * Set the content width in pixels, based on the theme's design and stylesheet.
+		 *
+		 * Priority 0 to make it available to lower priority callbacks.
+		 *
+		 * @global int $content_width
+		 */
+		public function gismo_content_width() {
+			$GLOBALS['content_width'] = apply_filters( 'gismo_content_width', 640 );
 		}
 		
 		public function gismo_save_settings() {
@@ -211,40 +629,49 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                             <h3>Site Theme</h3>
                                             
                                             <div>
-                                            <label class="option2">
-                                                <input type="radio" name="settings[style][theme]" value="default"<?php echo($this->settings['style']['theme'] == 'default' ? ' checked' : '');?>/>
-                                                <span class="radio">Plain</span>
-                                            </label>
+												
+												<label class="option2">
+													<input type="radio" name="settings[style][theme]" value="default"<?php echo($this->settings['style']['theme'] == 'default' ? ' checked' : '');?>/>
+													<span class="radio">Plain</span>
+												</label>
+
+												<label class="option2">
+													<input type="radio" name="settings[style][theme]" value="minimal"<?php echo($this->settings['style']['theme'] == 'minimal' ? ' checked' : '');?>/>
+													<span class="radio">Minimal</span>
+												</label>
+
+												<label class="option2">
+													<input type="radio" name="settings[style][theme]" value="corporate"<?php echo($this->settings['style']['theme'] == 'corporate' ? ' checked' : '');?>/>
+													<span class="radio">Corporate</span>
+												</label>
+
+												<label class="option2">
+													<input type="radio" name="settings[style][theme]" value="zesty"<?php echo($this->settings['style']['theme'] == 'zesty' ? ' checked' : '');?>/>
+													<span class="radio">Zesty</span>
+												</label>
+
+												<label class="option2">
+													<input type="radio" name="settings[style][theme]" value="dark"<?php echo($this->settings['style']['theme'] == 'dark' ? ' checked' : '');?>/>
+													<span class="radio">Dark</span>
+												</label>
+
+												<label class="option2">
+													<input type="radio" name="settings[style][theme]" value="custom"<?php echo($this->settings['style']['theme'] == 'custom' ? ' checked' : '');?>/>
+													<span class="radio">Custom</span>
+												</label>
                                             
-                                            <label class="option2">
-                                                <input type="radio" name="settings[style][theme]" value="minimal"<?php echo($this->settings['style']['theme'] == 'minimal' ? ' checked' : '');?>/>
-                                                <span class="radio">Minimal</span>
-                                            </label>
+                                            </div>
+											
+											<h3>Site Color</h3>
                                             
-                                            <label class="option2">
-                                                <input type="radio" name="settings[style][theme]" value="corporate"<?php echo($this->settings['style']['theme'] == 'corporate' ? ' checked' : '');?>/>
-                                                <span class="radio">Corporate</span>
-                                            </label>
-                                            
-                                            <label class="option2">
-                                                <input type="radio" name="settings[style][theme]" value="zesty"<?php echo($this->settings['style']['theme'] == 'zesty' ? ' checked' : '');?>/>
-                                                <span class="radio">Zesty</span>
-                                            </label>
-                                            
-                                            <label class="option2">
-                                                <input type="radio" name="settings[style][theme]" value="dark"<?php echo($this->settings['style']['theme'] == 'dark' ? ' checked' : '');?>/>
-                                                <span class="radio">Dark</span>
-                                            </label>
-                                            
-                                            <label class="option2">
-                                                <input type="radio" name="settings[style][theme]" value="custom"<?php echo($this->settings['style']['theme'] == 'custom' ? ' checked' : '');?>/>
-                                                <span class="radio">Custom</span>
-                                            </label>
+                                            <div>
+												
+												<input type="text" name="settings[style][color]" value="<?php echo $this->settings['style']['color'];?>" class="color-field" >
                                             
                                             </div>
                                             
                                         </div>
-                                        
+										
                                     </div>
                                 
                                 </div>
@@ -780,6 +1207,9 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                                     <option value="gismo_after_primary_navigation">After Primary Navigation</option>
                                                     <option value="gismo_secondary_navigation">Secondary Navigation</option>
                                                     <option value="gismo_sidebar">Sidebar</option>
+													<option value="gismo_before_blog">Before Blog</option>
+													<option value="gismo_before_content">Before Content</option>
+													<option value="gismo_after_content">After Content</option>
                                                     <option value="gismo_before_footer">Before Footer</option>
                                                     <option value="gismo_after_footer">After Footer</option>
                                                 </select>
@@ -856,6 +1286,9 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                                         <option value="gismo_after_primary_navigation"<?php echo($value['hook'] == 'gismo_after_primary_navigation' ? ' selected' : '');?>>After Primary Navigation</option>
                                                         <option value="gismo_secondary_navigation"<?php echo($value['hook'] == 'gismo_secondary_navigation' ? ' selected' : '');?>>Secondary Navigation</option>
                                                         <option value="gismo_sidebar"<?php echo($value['hook'] == 'gismo_sidebar' ? ' selected' : '');?>>Sidebar</option>
+														<option value="gismo_before_blog"<?php echo($value['hook'] == 'gismo_before_blog' ? ' selected' : '');?>>Before Blog</option>
+														<option value="gismo_before_content"<?php echo($value['hook'] == 'gismo_before_content' ? ' selected' : '');?>>Before Content</option>
+														<option value="gismo_after_content"<?php echo($value['hook'] == 'gismo_after_content' ? ' selected' : '');?>>After Content</option>
                                                         <option value="gismo_before_footer"<?php echo($value['hook'] == 'gismo_before_footer' ? ' selected' : '');?>>Before Footer</option>
                                                         <option value="gismo_after_footer"<?php echo($value['hook'] == 'gismo_after_footer' ? ' selected' : '');?>>After Footer</option>
                                                     </select>
@@ -943,6 +1376,9 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                                     <option value="gismo_after_primary_navigation">After Primary Navigation</option>
                                                     <option value="gismo_secondary_navigation">Secondary Navigation</option>
                                                     <option value="gismo_sidebar">Sidebar</option>
+													<option value="gismo_before_blog">Before Blog</option>
+													<option value="gismo_before_content">Before Content</option>
+													<option value="gismo_after_content">After Content</option>
                                                     <option value="gismo_before_footer">Before Footer</option>
                                                     <option value="gismo_after_footer">After Footer</option>
                                                 </select>
@@ -1019,6 +1455,9 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                                         <option value="gismo_after_primary_navigation"<?php echo($value['hook'] == 'gismo_after_primary_navigation' ? ' selected' : '');?>>After Primary Navigation</option>
                                                         <option value="gismo_secondary_navigation"<?php echo($value['hook'] == 'gismo_secondary_navigation' ? ' selected' : '');?>>Secondary Navigation</option>
                                                         <option value="gismo_sidebar"<?php echo($value['hook'] == 'gismo_sidebar' ? ' selected' : '');?>>Sidebar</option>
+														<option value="gismo_before_blog"<?php echo($value['hook'] == 'gismo_before_blog' ? ' selected' : '');?>>Before Blog</option>
+														<option value="gismo_before_content"<?php echo($value['hook'] == 'gismo_before_content' ? ' selected' : '');?>>Before Content</option>
+														<option value="gismo_after_content"<?php echo($value['hook'] == 'gismo_after_content' ? ' selected' : '');?>>After Content</option>
                                                         <option value="gismo_before_footer"<?php echo($value['hook'] == 'gismo_before_footer' ? ' selected' : '');?>>Before Footer</option>
                                                         <option value="gismo_after_footer"<?php echo($value['hook'] == 'gismo_after_footer' ? ' selected' : '');?>>After Footer</option>
                                                     </select>
@@ -1100,9 +1539,12 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
 			$screen = get_current_screen();
 			
 			if($current_page == 'gismo-settings'){
-			wp_enqueue_style('gismo-uikit-style', get_template_directory_uri() . '/js/uikit-2.27.2/css/uikit.gradient.min.css');
-			wp_enqueue_style('gismo-uikit-notify-style', get_template_directory_uri() . '/js/uikit-2.27.2/css/components/notify.gradient.min.css');
-			wp_enqueue_style('gismo-admin-style', get_template_directory_uri() . '/css/admin.css');
+				
+				wp_enqueue_style('wp-color-picker');
+				wp_enqueue_style('gismo-uikit-style', get_template_directory_uri() . '/js/uikit-2.27.2/css/uikit.gradient.min.css');
+				wp_enqueue_style('gismo-uikit-notify-style', get_template_directory_uri() . '/js/uikit-2.27.2/css/components/notify.gradient.min.css');
+				wp_enqueue_style('gismo-admin-style', get_template_directory_uri() . '/css/admin.css');
+				
 			}
 			
 		}
@@ -1116,6 +1558,8 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
 			wp_enqueue_media();
 			wp_enqueue_script('jquery');
 			wp_enqueue_script('jquery-ui-sortable');
+			wp_enqueue_script('wp-color-picker');
+			
 			wp_enqueue_script('gismo-uikit', get_template_directory_uri() . '/js/uikit-2.27.2/js/uikit.min.js', array('jquery'), '2.27.2', true);
 			wp_enqueue_script('gismo-uikit-notify', get_template_directory_uri() . '/js/uikit-2.27.2/js/components/notify.min.js', array('gismo-uikit'), '2.27.2', true);
 			wp_enqueue_script('admin-style', get_template_directory_uri() . '/js/admin.js', array('jquery'), '2016.11.24', true);

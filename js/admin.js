@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
         });
 		
 		var $packet = $this.closest('form').serializeArray();
-		console.log($packet);
+		
 		$.ajax({
 			url: ajaxurl,
 			data: $packet,
@@ -213,5 +213,7 @@ jQuery(document).ready(function($) {
 		$('#' + value + '-layout').show();
 		$('#' + value + '-layout').find('select').removeAttr('disabled');
 	});
+	
+	$('.color-field').wpColorPicker();
 	
 });

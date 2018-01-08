@@ -16,6 +16,12 @@ $gismo_ts = $GLOBALS['gismo_theme_settings'];
 
 get_header(); ?>
 
+<?php if(has_action('gismo_before_content')):?>
+<div class="before-content">
+<?php do_action('gismo_before_content');?>
+</div>
+<?php endif;?>
+
 <div id="content" class="<?php echo apply_filters('gismo_content_classes', 'site-content');?>">
 
 	<div class="flexy">
@@ -67,6 +73,12 @@ get_header(); ?>
      </div>
 
 </div>
+
+<?php if(has_action('gismo_after_content')):?>
+<div class="after-content">
+<?php do_action('gismo_after_content');?>
+</div>
+<?php endif;?>
 
 <?php
 
