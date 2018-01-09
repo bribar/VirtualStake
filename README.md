@@ -86,4 +86,6 @@ Theme Hooks
 ---
 If you interested in using "Theme Hooks", when logged in and viewing the site as an administrator, you will find tag indicators for the hooks. Assigning menus and sidebars would appear in the respective hook tag.
 
-![Alt text](/assets/hook-indicator.png "Hook Tag")
+Example tag indicator
+
+![Alt text](/VirtualStake/assets/hook-indicator.png "Hook Tag")
