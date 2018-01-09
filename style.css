@@ -896,7 +896,7 @@ header{
 	padding-bottom: 0 !important;
 }
 
-.format-image a, .format-video a, .format-gallery .card-bottom{
+.blog .format-image a, .blog .format-video a, .blog .format-gallery .card-bottom{
 	border: 10px solid #fff;
 	display: block;
 	position: relative;
@@ -1299,6 +1299,10 @@ a:active {
     font-family: 'Lato', sans-serif;
     font-size: 0.75em;
     color: #666;
+}
+
+.error-404 input[type="search"]{
+	background: #fff !important;
 }
 
 .search-form .search-submit{

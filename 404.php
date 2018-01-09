@@ -10,9 +10,11 @@
 get_header(); ?>
 
 	<div id="primary" class="content-area">
+		
 		<main id="main" class="site-main" role="main">
 
 			<section class="error-404 not-found">
+				
 				<header class="page-header">
 					<h1 class="page-title"><?php esc_html_e( 'Oops! That page can&rsquo;t be found.', 'gismo' ); ?></h1>
 				</header><!-- .page-header -->
@@ -23,7 +25,7 @@ get_header(); ?>
 					<?php
 						get_search_form();
 
-						the_widget( 'WP_Widget_Recent_Posts' );
+						//the_widget( 'WP_Widget_Recent_Posts' );
 
 						// Only show the widget if site has multiple categories.
 						if ( gismo_categorized_blog() ) :
@@ -31,7 +33,7 @@ get_header(); ?>
 
 					<div class="widget widget_categories">
 						<h2 class="widget-title"><?php esc_html_e( 'Most Used Categories', 'gismo' ); ?></h2>
-						<ul>
+						<ul style="display: block; margin-left: 25px;">
 						<?php
 							wp_list_categories( array(
 								'orderby'    => 'count',
@@ -43,21 +45,24 @@ get_header(); ?>
 						?>
 						</ul>
 					</div><!-- .widget -->
-
+					
+					<?php endif;?>
+					<div style="margin-top: 25px;">
 					<?php
-						endif;
-
 						/* translators: %1$s: smiley */
 						$archive_content = '<p>' . sprintf( esc_html__( 'Try looking in the monthly archives. %1$s', 'gismo' ), convert_smilies( ':)' ) ) . '</p>';
 						the_widget( 'WP_Widget_Archives', 'dropdown=1', "after_title=</h2>$archive_content" );
 
 						the_widget( 'WP_Widget_Tag_Cloud' );
 					?>
+					</div>
 
 				</div><!-- .page-content -->
+				
 			</section><!-- .error-404 -->
 
 		</main><!-- #main -->
+		
 	</div><!-- #primary -->
 
 <?php
