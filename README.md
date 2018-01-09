@@ -88,4 +88,4 @@ If you interested in using "Theme Hooks", when logged in and viewing the site as
 
 Example tag indicator:
 
-![Hook Tag](/assets/hook-indicator.png "Hook Tag")
+![Hook Tag](https://github.com/bribar/VirtualStake/raw/master/assets/hook-indicator.png "Hook Tag")
