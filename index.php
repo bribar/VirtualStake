@@ -28,6 +28,10 @@ get_header();
 </div>
 <?php endif;?>
 
+<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+<div class="hook-area">Before Blog</div>
+<?php endif;?>
+
 <?php endif;?>
 
 <div id="content" class="<?php echo apply_filters('gismo_content_classes', 'site-content');?>">
@@ -43,6 +47,10 @@ get_header();
         		<?php do_action('gismo_sidebar');?>
             </div>
             <?php endif;?>
+			
+			<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+			<div class="hook-area">Sidebar</div>
+			<?php endif;?>
         
         </div>
         
@@ -174,6 +182,10 @@ get_header();
         		<?php do_action('gismo_sidebar');?>
             </div>
             <?php endif;?>
+			
+			<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+			<div class="hook-area">Sidebar</div>
+			<?php endif;?>
         
         </div>
         
@@ -182,6 +194,20 @@ get_header();
     </div>
     
 </div>
+
+<?php if(is_home() && is_front_page()):?>
+
+<?php if(has_action('gismo_after_blog')):?>
+<div class="after-blog">
+<?php do_action('gismo_after_blog');?>
+</div>
+<?php endif;?>
+
+<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+<div class="hook-area">After Blog</div>
+<?php endif;?>
+
+<?php endif;?>
 
 <?php
 

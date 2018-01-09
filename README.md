@@ -66,7 +66,7 @@ The Virtual Stake theme has some customizations through the Wordpress Admin Menu
 	
 	Web developer or designer recommended.
 	
-2. Menus Tab
+2. Menus Tab - Web developer or designer may be required
 
 	If you need to add more menus than the current site navigation on the home page then you can setup menu locations here.
 	
@@ -74,7 +74,7 @@ The Virtual Stake theme has some customizations through the Wordpress Admin Menu
 	
 	When adding a new theme menu location through theme settings, the "Theme Hook" is required. This places the assigned menus to this area of the theme.
 	
-3. Sidebars Tab
+3. Sidebars Tab - Web developer or designer may be required
 
 	This works similarly to the Menus Tab.
 	
@@ -84,3 +84,6 @@ The Virtual Stake theme has some customizations through the Wordpress Admin Menu
 	
 Theme Hooks
 ---
+If you interested in using "Theme Hooks", when logged in and viewing the site as an administrator, you will find tag indicators for the hooks. Assigning menus and sidebars would appear in the respective hook tag.
+
+![Alt text](/VirtualStake/assets/hook-indicator.ping "Hook Tag")

@@ -17,6 +17,10 @@ get_header(); ?>
 </div>
 <?php endif;?>
 
+<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+<div class="hook-area">Before Content</div>
+<?php endif;?>
+
 	<div id="content" class="<?php echo apply_filters('gismo_content_classes', 'site-content');?>">
     	
     	<div class="flexy">
@@ -29,6 +33,10 @@ get_header(); ?>
 				<div>
 					<?php do_action('gismo_sidebar');?>
 				</div>
+				<?php endif;?>
+				
+				<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+				<div class="hook-area">Sidebar</div>
 				<?php endif;?>
 
 			</div>
@@ -66,6 +74,10 @@ get_header(); ?>
 				<div>
 					<?php do_action('gismo_sidebar');?>
 				</div>
+				<?php endif;?>
+				
+				<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+				<div class="hook-area">Sidebar</div>
 				<?php endif;?>
 
 			</div>

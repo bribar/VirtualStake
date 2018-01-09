@@ -33,12 +33,26 @@ $gismo_ts = $GLOBALS['gismo_theme_settings'];
 		
 		<div id="left">
 			
+			<?php if(has_action('gismo_before_header')):?>
+			<div class="before-header-wrapper">
+				<?php do_action('gismo_before_header');?>
+			</div>
+			<?php endif;?>
+
+			<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+			<div class="hook-area">Before Header</div>
+			<?php endif;?>
+			
 			<div class="box-pad">
 				
 				<?php if(has_action('gismo_before_logo')):?>
 				<div class="before-logo-wrapper">
 					<?php do_action('gismo_before_logo');?>
 				</div>
+				<?php endif;?>
+				
+				<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+				<div class="hook-area">Before Logo</div>
 				<?php endif;?>
 
 				<h1 id="logo">
@@ -65,17 +79,28 @@ $gismo_ts = $GLOBALS['gismo_theme_settings'];
 					<?php do_action('gismo_after_logo');?>
 				</div>
 				<?php endif;?>
+				
+				<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+				<div class="hook-area">After Logo</div>
+				<?php endif;?>
 
 				<?php if(has_action('gismo_primary_navigation')):?>
 				<div class="primary-navigation-wrapper">
 				<?php do_action('gismo_primary_navigation');?>
 				</div>
 				<?php endif;?>
+				<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+				<div class="hook-area">Primary Navigation</div>
+				<?php endif;?>
 
 				<?php if(has_action('gismo_after_primary_navigation')):?>
 				<div class="after-primary-navigation-wrapper">
 				<?php do_action('gismo_after_primary_navigation');?>
 				</div>
+				<?php endif;?>
+				
+				<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+				<div class="hook-area">After Primary Navigation</div>
 				<?php endif;?>
 
 				<?php if(has_action('gismo_secondary_navigation')):?>
@@ -84,11 +109,33 @@ $gismo_ts = $GLOBALS['gismo_theme_settings'];
 				</div>
 				<?php endif;?>
 				
+				<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+				<div class="hook-area">Secondary Navigation</div>
+				<?php endif;?>
+				
+				<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+				<div class="hook-area">Before Footer</div>
+				<?php endif;?>
+				
 				<div class="site-info">
 					&copy; <?php echo date('Y');?> <?php bloginfo( 'name' ); ?>.
 				</div>
 				
+				<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+				<div class="hook-area">After Footer</div>
+				<?php endif;?>
+				
 			</div>
+			
+			<?php if(has_action('gismo_after_header')):?>
+			<div class="after-header-wrapper">
+				<?php do_action('gismo_after_header');?>
+			</div>
+			<?php endif;?>
+
+			<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+			<div class="hook-area">After Header</div>
+			<?php endif;?>
 			
 		</div>
 		

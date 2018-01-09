@@ -26,6 +26,10 @@ get_header(); ?>
                         <?php do_action('gismo_sidebar');?>
                     </div>
                     <?php endif;?>
+					
+					<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+					<div class="hook-area">Sidebar</div>
+					<?php endif;?>
     
                 </div>
             
@@ -79,6 +83,10 @@ get_header(); ?>
                         <?php do_action('gismo_sidebar');?>
                     </div>
                     <?php endif;?>
+					
+					<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+					<div class="hook-area">Sidebar</div>
+					<?php endif;?>
     
                 </div>
             

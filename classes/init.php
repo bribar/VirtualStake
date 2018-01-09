@@ -9,6 +9,7 @@
 // gismo_secondary_navigation
 // gismo_sidebar
 // gismo_before_blog
+// gismo_after_blog
 // gismo_before_content
 // gismo_after_content
 // gismo_before_footer

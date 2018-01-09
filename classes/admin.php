@@ -1207,6 +1207,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                                     <option value="gismo_secondary_navigation">Secondary Navigation</option>
                                                     <option value="gismo_sidebar">Sidebar</option>
 													<option value="gismo_before_blog">Before Blog</option>
+													<option value="gismo_before_blog">Before Blog</option>
 													<option value="gismo_before_content">Before Content</option>
 													<option value="gismo_after_content">After Content</option>
                                                     <option value="gismo_before_footer">Before Footer</option>
@@ -1286,6 +1287,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                                         <option value="gismo_secondary_navigation"<?php echo($value['hook'] == 'gismo_secondary_navigation' ? ' selected' : '');?>>Secondary Navigation</option>
                                                         <option value="gismo_sidebar"<?php echo($value['hook'] == 'gismo_sidebar' ? ' selected' : '');?>>Sidebar</option>
 														<option value="gismo_before_blog"<?php echo($value['hook'] == 'gismo_before_blog' ? ' selected' : '');?>>Before Blog</option>
+														<option value="gismo_after_blog"<?php echo($value['hook'] == 'gismo_after_blog' ? ' selected' : '');?>>After Blog</option>
 														<option value="gismo_before_content"<?php echo($value['hook'] == 'gismo_before_content' ? ' selected' : '');?>>Before Content</option>
 														<option value="gismo_after_content"<?php echo($value['hook'] == 'gismo_after_content' ? ' selected' : '');?>>After Content</option>
                                                         <option value="gismo_before_footer"<?php echo($value['hook'] == 'gismo_before_footer' ? ' selected' : '');?>>Before Footer</option>
@@ -1376,6 +1378,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                                     <option value="gismo_secondary_navigation">Secondary Navigation</option>
                                                     <option value="gismo_sidebar">Sidebar</option>
 													<option value="gismo_before_blog">Before Blog</option>
+													<option value="gismo_before_blog">Before Blog</option>
 													<option value="gismo_before_content">Before Content</option>
 													<option value="gismo_after_content">After Content</option>
                                                     <option value="gismo_before_footer">Before Footer</option>
@@ -1455,6 +1458,7 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                                         <option value="gismo_secondary_navigation"<?php echo($value['hook'] == 'gismo_secondary_navigation' ? ' selected' : '');?>>Secondary Navigation</option>
                                                         <option value="gismo_sidebar"<?php echo($value['hook'] == 'gismo_sidebar' ? ' selected' : '');?>>Sidebar</option>
 														<option value="gismo_before_blog"<?php echo($value['hook'] == 'gismo_before_blog' ? ' selected' : '');?>>Before Blog</option>
+														<option value="gismo_after_blog"<?php echo($value['hook'] == 'gismo_after_blog' ? ' selected' : '');?>>After Blog</option>
 														<option value="gismo_before_content"<?php echo($value['hook'] == 'gismo_before_content' ? ' selected' : '');?>>Before Content</option>
 														<option value="gismo_after_content"<?php echo($value['hook'] == 'gismo_after_content' ? ' selected' : '');?>>After Content</option>
                                                         <option value="gismo_before_footer"<?php echo($value['hook'] == 'gismo_before_footer' ? ' selected' : '');?>>Before Footer</option>

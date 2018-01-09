@@ -77,3 +77,7 @@ $links = get_post_meta( $post->ID, '_gismo_post_format_section_links', true );
 <?php do_action('gismo_after_content');?>
 </div>
 <?php endif;?>
+
+<?php if(is_user_logged_in() && current_user_can('activate_plugins')):?>
+<div class="hook-area">After Content</div>
+<?php endif;?>
