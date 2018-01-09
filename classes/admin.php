@@ -557,7 +557,6 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                 <li><a href="" class="uk-navbar-nav uk-active">Layout</a></li>
                                 <li><a href="" class="uk-navbar-nav">Menus</a></li>
                                 <li><a href="" class="uk-navbar-nav">Sidebars</a></li>
-                                <li><a href="" class="uk-navbar-nav">Integrations</a></li>
                             </ul>
                             
                         </nav>
@@ -1514,7 +1513,6 @@ if ( ! class_exists( 'Gismo_Admin' ) ) {
                                 </form>
                                 
                             </li>
-                            <li>Integrations Details</li>
                         </ul>
                     
                     </div>
