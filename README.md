@@ -2,8 +2,8 @@ Theme Installation
 ---
 The Virtual Stake theme is easy to install with two options:
 
-1. Simply upload it through Wordpress Admin Menu \> Appearance \> Themes \> Add New  \> Upload Theme.
-2. Unzip downloaded theme. Upload root folder through FTP \> wp-content \> themes
+1. Simply upload the downloaded theme zip file through Wordpress Admin Menu \> Appearance \> Themes \> Add New  \> Upload Theme.
+2. Unzip the downloaded theme. Upload zip contents through FTP \> wp-content \> themes
 
 After install, activate "Virtual Stake Theme". On activation, this process might take a few minutes because the theme also installs a set of useful plugins.
 
@@ -21,9 +21,12 @@ By default, the theme installs these plugins:
 	This plugin makes it easy to create photo galleries within pages or posts.
 	
 4. Github Updater - automatically activated
+
+	Receive notices for Virtual Stake theme updates. This plugin should always remain activated.
+
 5. MailChimp Forms by MailMunch - not activated
 
-	Signup with Mailchimp is required. This plugin simple creates sign up forms such as newsletters to capture emails on Mailchimp lists and campaigns.
+	Signup with Mailchimp is required. If you wish to capture emails for campaigns or newsletters this is a great plugin to use.
 	
 6. Share Buttons by AddThis - automatically activated
 
@@ -52,15 +55,15 @@ The Virtual Stake theme has some customizations through the Wordpress Admin Menu
 
 	###### Site Logo
 	
-	If you click the text within the white box above {No Logo Set} you can change your site title and description. For the https://riversidestake.church the title is the name of the stake and the description is the stake theme. Your free to set it up as your wish. 
+	If you click the text within the white box above {No Logo Set} you can change your site title and description. For the https://riversidestake.church the title is the name of the stake and the description is the stake theme. You're free to set it up as you wish. 
 	
 	###### Site Backgound
 	
-	If you have a nice background image you want to use this will appear as the background of the home blog page. Dimension should be at least 1600 pixels wide for best results
+	If you have a nice background image you want to use it will appear as the background of the home blog page. Dimension should be at least 1600 pixels wide for best results.
 	
 	###### Site Theme & Color
 	
-	Currently "Minimal" is the only theme option but you can change your site color.
+	Currently "Minimal" is the only theme option, but you can change your site color.
 	
 	###### UIKit
 	
@@ -70,7 +73,7 @@ The Virtual Stake theme has some customizations through the Wordpress Admin Menu
 
 	If you need to add more menus than the current site navigation on the home page then you can setup menu locations here.
 	
-	Menus are setup under Wordpress Admin Menu \> Appearance \> Menus. When creating a menu you can assign it to a menu location. Any menu locations you have created in Theme Setting would appear here.
+	Menus are setup under Wordpress Admin Menu \> Appearance \> Menus. When creating a menu you can assign it to a menu location. Any menu locations you have created in Theme Settings would appear here.
 	
 	When adding a new theme menu location through theme settings, the "Theme Hook" is required. This places the assigned menus to this area of the theme.
 	
@@ -80,11 +83,11 @@ The Virtual Stake theme has some customizations through the Wordpress Admin Menu
 	
 	The main difference is that the sidebars are added to Wordpress Admin Menu \> Appearance \> Widgets. Currently the theme has one sidebar called "After Navigation". Any available widgets added to this sidebar would show up under the sites navigation.
 	
-	If you need to add more widgets to different areas of the site, you would do this through the Sidebars Tab by selecting the appropriate "Theme Hook"
+	If you need to add more widgets to different areas of the site, you would do this through the Sidebars Tab by selecting the appropriate "Theme Hook".
 	
 Theme Hooks
 ---
-If you interested in using "Theme Hooks", when logged in and viewing the site as an administrator, you will find tag indicators for the hooks. Assigning menus and sidebars would appear in the respective hook tag.
+If you interested in using "Theme Hooks", when logged in and viewing the site as an administrator, you will find tag indicators for the hooks. Assigning menus and sidebars would appear in the respective hook.
 
 Example tag indicator:
 
